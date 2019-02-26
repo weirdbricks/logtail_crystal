@@ -71,6 +71,13 @@ if File.exists?(offset_filename)
 			stored_first_byte_number = 0
 		end
 
+		# in the case someone run a `cat /dev/null` against our file, the current number of bytes will be less
+		# than our saved values but the inodes will be the same!!! we want to catch that
+		if (filename.size < stored_first_byte_number) && (current_inode == stored_inode)
+			puts "#{OK} - The inodes are the same but the file is smaller than the last saved position. Starting from 0"
+			stored_first_byte_number = 0
+		end
+
 		if (filename.size != stored_first_byte_number) && (current_inode == stored_inode)
 			puts "#{OK} - The inodes are the same: #{stored_inode} - Will start from: #{stored_first_byte_number}"
 		end
@@ -82,9 +89,13 @@ else
 	puts "#{INFO} - I did not find an existing file \"#{offset_filename}\""
 end
 
+# move ahead in the file skipping the bytes we've already read
 filename.seek(stored_first_byte_number)
-while filename.gets
-	puts filename.gets
+
+loop do
+	next_bytes=filename.gets
+	break if next_bytes.nil?
+        puts next_bytes
 end
 
 File.write(offset_filename, "#{current_inode}=#{filename.pos}")
