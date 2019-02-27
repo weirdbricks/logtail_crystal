@@ -1,8 +1,8 @@
 # we can have 1 or 2 arguments, but not 0 or more than 2
 if ARGV.size == 0 || ARGV.size > 2
-	puts "Usage: You need to provide a filename"
-	puts "#{PROGRAM_NAME} filename"
-	puts "Optionally you can provide a filename to store the offset position, by default it will be under \"/tmp\""
+	STDERR.puts "Usage: You need to provide a filename"
+	STDERR.puts "#{PROGRAM_NAME} filename"
+	STDERR.puts "Optionally you can provide a filename to store the offset position, by default it will be under \"/tmp\""
 	exit 0
 end
 
@@ -51,42 +51,41 @@ check_if_path_is_writable(offset_directory)
 # if not, we start from 0 and create the offset file
 stored_first_byte_number=0
 if File.exists?(offset_filename)
-	puts "#{INFO} - The offset file #{offset_filename} exists - attempting to read values from it..."
+	STDERR.puts "#{INFO} - The offset file #{offset_filename} exists - attempting to read values from it..."
 	begin
 		# note - the format of the file is expected to look like this:
 		# inode number = first_byte_number
 		string_from_offset_file  = File.read(offset_filename)
 		stored_inode             = string_from_offset_file.split("=")[0].strip.to_i
 		stored_first_byte_number = string_from_offset_file.split("=")[1].strip.to_i
+        rescue
+                STDERR.puts "#{FAIL} - Something went wrong while trying to tokenize: #{string_from_offset_file}"
+        end
 
-		# if the filename size is the same as the stored position there's nothing else to do. 
-		if (filename.size == stored_first_byte_number) && (current_inode == stored_inode)
-			puts "#{OK} - Got the inode: #{stored_inode} - The current size of the file is the same as the stored position: #{stored_first_byte_number} bytes. No new lines."
-			exit 0
-		end
-
-		# although very unlikely if the byte position is the same but the inode different, start from the beginning
-		if (filename.size == stored_first_byte_number) && (current_inode != stored_inode)
-			puts "#{OK} - The current size of the file is the same as the stored position: #{stored_first_byte_number} bytes, but the inodes are different. Starting from 0."		
-			stored_first_byte_number = 0
-		end
-
-		# in the case someone run a `cat /dev/null` against our file, the current number of bytes will be less
-		# than our saved values but the inodes will be the same!!! we want to catch that
-		if (filename.size < stored_first_byte_number) && (current_inode == stored_inode)
-			puts "#{OK} - The inodes are the same but the file is smaller than the last saved position. Starting from 0"
-			stored_first_byte_number = 0
-		end
-
-		if (filename.size != stored_first_byte_number) && (current_inode == stored_inode)
-			puts "#{OK} - The inodes are the same: #{stored_inode} - Will start from: #{stored_first_byte_number}"
-		end
-
-	rescue
-		puts "Something went wrong while trying to tokenize: #{string_from_offset_file}"
+	case
+	# if the filename size is the same as the stored position there's nothing else to do.	
+	when (filename.size == stored_first_byte_number) && (current_inode == stored_inode)
+		STDERR.puts "#{OK} - Got the inode: #{stored_inode} - The current size of the file is the same as the stored position: #{stored_first_byte_number} bytes. No new lines."
+                exit 0
+	# although very unlikely if the byte position is the same but the inode different, start from the beginning
+	when (filename.size == stored_first_byte_number) && (current_inode != stored_inode)
+		STDERR.puts "#{OK} - The current size of the file is the same as the stored position: #{stored_first_byte_number} bytes, but the inodes are different. Starting from 0."
+		stored_first_byte_number = 0
+	# in the case someone run a `cat /dev/null` against our file, the current number of bytes will be less
+	when (filename.size < stored_first_byte_number) && (current_inode == stored_inode)
+		STDERR.puts "#{OK} - The inodes are the same but the file is smaller than the last saved position. Starting from 0"
+		stored_first_byte_number = 0
+	# the most common case - new lines have been added
+	when (filename.size != stored_first_byte_number) && (current_inode == stored_inode)
+		STDERR.puts "#{OK} - The inodes are the same: #{stored_inode} - Will start from: #{stored_first_byte_number}"
+        # in case the inode has been changed, we want to start from the beginning
+        when (filename.size != stored_first_byte_number) && (current_inode != stored_inode)
+		STDERR.puts "#{OK} - The inode has changed. Starting from 0."
+                stored_first_byte_number = 0
 	end
+
 else
-	puts "#{INFO} - I did not find an existing file \"#{offset_filename}\""
+	STDERR.puts "#{INFO} - I did not find an existing file \"#{offset_filename}\""
 end
 
 # move ahead in the file skipping the bytes we've already read

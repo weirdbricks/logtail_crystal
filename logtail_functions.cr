@@ -7,13 +7,13 @@ module LogtailFunctions
 	        begin
 	                File.info(file).to_s.split("@st_ino=")[1].split("_u64")[0].to_i
 	        rescue
-	                puts "#{FAIL} - Something went wrong while trying to get the inode of the file \"#{file}\""
+	                STDERR.puts "#{FAIL} - Something went wrong while trying to get the inode of the file \"#{file}\""
 	        end
 	end
 
 	def check_if_filename_exists(filename)
 	        if File.exists?(filename)
-	                puts "#{OK} - \"#{filename}\" exists"
+	                STDERR.puts "#{OK} - \"#{filename}\" exists"
 	        else
 	                abort "#{FAIL} - Sorry, \"#{filename}\" doesn't exist"
 	        end
@@ -23,7 +23,7 @@ module LogtailFunctions
 	# checks if the filename is a real file instead of symlink/device etc.
 	def check_if_valid_file(filename)
 	        if File.file?(filename)
-	                puts "#{OK} - I'll load this file: #{filename}"
+	                STDERR.puts "#{OK} - I'll load this file: #{filename}"
 	                logfile=File.new(filename)
 	        else
 	                abort "#{FAIL} - Sorry, \"#{filename}\" - this is not a file"
@@ -34,7 +34,7 @@ module LogtailFunctions
 	# checks if the user running this script has permissions to write there or not
 	def check_if_path_is_writable(directory)
 	        if File.writable?(directory)
-	                puts "#{OK} - I do have permissions to write at \"#{directory}\""
+	                STDERR.puts "#{OK} - I do have permissions to write at \"#{directory}\""
 	        else
 	                abort "#{FAIL} - Sorry, I do not have permissions to write at \"#{directory}\""
 	        end
@@ -44,7 +44,7 @@ module LogtailFunctions
         # checks if the user running this script has permissions to read the file or not
         def check_if_file_is_readable(filename)
                 if File.readable?(filename)
-                        puts "#{OK} - I do have permissions to read \"#{filename}\""
+                        STDERR.puts "#{OK} - I do have permissions to read \"#{filename}\""
                 else
                         abort "#{FAIL} - Sorry, I do not have permissions to read \"#{filename}\""
                 end
