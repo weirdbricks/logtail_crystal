@@ -8,12 +8,19 @@ An implementation of the [logtail](http://manpages.ubuntu.com/manpages/trusty/ma
 * If the inode has changed it starts from the beginning
 * If the file size is smaller than the offset, it starts from the beginning
 
-## To build on Ubuntu 18:
+## To build on Ubuntu 22:
 
-* [Make sure you have Crystal 0.27 installed](https://crystal-lang.org/docs/installation/on_debian_and_ubuntu.html)
+* [Make sure you have Crystal 1.8.2 installed](https://crystal-lang.org/docs/installation/on_debian_and_ubuntu.html)
 * Clone the repo: `git clone https://github.com/weirdbricks/logtail_crystal.git`
-* Build: `crystal build --static --release logtail.cr`
+* Build: `crystal build --static --release --no-debug logtail.cr`
 * Run: `./logtail`
+
+## Optionally also move to /usr/local/bin
+
+```
+crystal build --static --release --no-debug logtail.cr
+mv ./logtail /usr/local/bin/
+```
 
 ## Usage instructions:
 
