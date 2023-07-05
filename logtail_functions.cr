@@ -13,9 +13,7 @@ module LogtailFunctions
   # takes a filename as an argument
   # if the filename doesn't exist, it will abort
   def check_if_filename_exists(filename)
-    if File.exists?(filename)
-      STDERR.puts "#{OK} - \"#{filename}\" exists"
-    else
+    unless File.exists?(filename)
       abort "#{FAIL} - Sorry, \"#{filename}\" doesn't exist"
     end
   end
@@ -23,10 +21,7 @@ module LogtailFunctions
   # takes a filename as an argument
   # checks if the filename is a real file instead of symlink/device etc.
   def check_if_valid_file(filename)
-    if File.file?(filename)
-      STDERR.puts "#{OK} - I'll load this file: #{filename}"
-      File.new(filename)
-    else
+    unless File.file?(filename)
       abort "#{FAIL} - Sorry, \"#{filename}\" - this is not a file"
     end
   end
@@ -34,10 +29,8 @@ module LogtailFunctions
   # takes a directory as an argument
   # checks if the user running this script has permissions to write there or not
   def check_if_path_is_writable(directory)
-    if File.writable?(directory)
-      STDERR.puts "#{OK} - I do have permissions to write at \"#{directory}\""
-    else
-      abort "#{FAIL} - Sorry, I do not have permissions to write at \"#{directory}\""
+    unless File.writable?(directory)
+      abort "#{FAIL} - Sorry, I do not have permission to write at \"#{directory}\""
     end
   end
 
@@ -45,10 +38,8 @@ module LogtailFunctions
   # checks if the user running this script has permissions to read the file or not
   # if the user does not have the permissions it aborts
   def check_if_file_is_readable(filename)
-    if File.readable?(filename)
-      STDERR.puts "#{OK} - I do have permissions to read \"#{filename}\""
-    else
-      abort "#{FAIL} - Sorry, I do not have permissions to read \"#{filename}\""
+    unless File.readable?(filename)
+      abort "#{FAIL} - Sorry, I do not have permission to read \"#{filename}\""
     end
   end
 end

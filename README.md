@@ -13,12 +13,14 @@ An implementation of the [logtail](http://manpages.ubuntu.com/manpages/trusty/ma
 * [Make sure you have Crystal 1.8.2 installed](https://crystal-lang.org/docs/installation/on_debian_and_ubuntu.html)
 * Clone the repo: `git clone https://github.com/weirdbricks/logtail_crystal.git`
 * Build: `crystal build --static --release --no-debug logtail.cr`
+* Strip: `strip logtail`
 * Run: `./logtail`
 
 ## Optionally also move to /usr/local/bin
 
 ```
 crystal build --static --release --no-debug logtail.cr
+strip logtail
 mv ./logtail /usr/local/bin/
 ```
 

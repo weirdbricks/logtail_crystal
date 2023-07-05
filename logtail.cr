@@ -26,8 +26,8 @@ include LogtailFunctions
 ##########################################################################################
 
 filename=ARGV[0]
-check_if_file_is_readable(filename)
 check_if_filename_exists(filename)
+check_if_file_is_readable(filename)
 current_inode=get_inode(filename)
 
 # if an offset filename was provided, then use that as the location for the offset
@@ -83,9 +83,8 @@ if File.exists?(offset_filename)
     STDERR.puts "#{OK} - The inode has changed. Starting from 0."
    stored_first_byte_number = 0
   end
-
 else
-  STDERR.puts "#{INFO} - I did not find an existing file \"#{offset_filename}\""
+  STDERR.puts "#{INFO} - I did not find an existing offset file \"#{offset_filename}\""
 end
 
 # move ahead in the file skipping the bytes we've already read
