@@ -1,6 +1,6 @@
 # logtail_crystal
 
-An implementation of the [logtail](http://manpages.ubuntu.com/manpages/trusty/man8/logtail2.8.html) command written in [Crystal Lang](https://crystal-lang.org)
+An implementation of the [logtail](https://linux.die.net/man/8/logtail) command written in [Crystal Lang](https://crystal-lang.org)
 
 ## Behavior:
 
